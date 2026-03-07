@@ -1,1 +1,6 @@
-DEEPSEEK_API_KEY=sk-0929f254f5784f0185b1e3ce862695db
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.env
+venv/
