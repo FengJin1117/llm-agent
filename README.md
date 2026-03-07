@@ -5,7 +5,7 @@
 - ✅自动测试：test/test_llm_connection.py。使用**pytest**命令
 - github备份
 
-![系统界面_v0.1](images)
+![系统界面_v0.1](images/demo_v0.1.png)
 
 ## v0.2
 
