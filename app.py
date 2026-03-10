@@ -2,10 +2,13 @@
 
 import gradio as gr
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()   # 自动读取 .env
+
 from ui.chat_ui import build_chat_ui
 
-from dotenv import load_dotenv
-load_dotenv()
 
 def main():
     demo = build_chat_ui()
