@@ -2,6 +2,8 @@
 测试 DeepSeek API 是否可用
 """
 
+# test/test_llm_connection.py
+
 from core.llm_manager import get_llm
 
 

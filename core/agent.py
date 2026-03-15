@@ -1,25 +1,118 @@
+# core/agent.py
+
 from core.llm_manager import get_llm
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
+import os
+from core.rag import simple_retrieval
+from rag.retriever import retrieve
+
+
+
+def generate_image_stub(prompt: str):
+    """
+    临时图像生成函数（MVP）
+    实际上只是返回一张本地图片
+    """
+
+    img_path = "images/city_cyperpunk.png"
+
+    if not os.path.exists(img_path):
+        return None
+
+    return img_path
 
 
 class SimpleAgent:
 
     def __init__(self, model_name):
+        # 设计模式：工厂模式。根据传入的 model_name 获取不同的 LLM 实例，方便后续扩展支持更多模型。
         self.llm = get_llm(model_name)
 
-    def chat(self, message, history):
+    def detect_tool(self, message: str):
+        """
+        最简单的工具判别
+        """
 
+        keywords = [
+            "画",
+            "生成图片",
+            "画一张",
+            "image",
+            "picture"
+        ]
+
+        for k in keywords:
+            if k in message:
+                return "image_gen"
+
+        return None
+
+    def chat(self, message, history, use_rag=False):
+
+        # 1 先判断是否调用工具
+        tool = self.detect_tool(message)
+
+        if tool == "image_gen":
+
+            img_path = generate_image_stub(message)
+
+            if img_path:
+                # return f"我为你生成了一张图片：\n\n![]({img_path})"
+                # return f"我为你生成了一张图片： ![](/file=images/city_cyperpunk.png)"
+                return """
+我为你生成了一张图片：
+
+<img src="/file=images/city_cyperpunk.png" width="400">
+"""
+            else:
+                return "图片生成失败"
+
+
+        # 2 正常 LLM 对话
         messages = [
             SystemMessage(content="你是一个AI助手。")
         ]
 
-        for msg in history:
+        # ===== RAG =====
+        # if use_rag:
+        #     docs = simple_retrieval(message)
+
+        #     if docs:
+        #         context = "\n".join(docs)
+
+        #         messages.append(
+        #             SystemMessage(
+        #                 content=f"参考知识库内容：\n{context}"
+        #             )
+        #         )
+
+        # 加入历史
+        for msg in history:    # history 是一个列表，包含之前的对话记录，每条记录是一个字典，包含 "role" 和 "content" 两个字段
 
             if msg["role"] == "user":
                 messages.append(HumanMessage(content=msg["content"]))
 
             elif msg["role"] == "assistant":
                 messages.append(AIMessage(content=msg["content"]))
+
+                # RAG
+        if use_rag:
+
+            context = retrieve(message)
+
+            rag_prompt = f"""
+根据以下资料回答问题：
+
+{context}
+
+问题：
+{message}
+"""
+
+            messages.append(HumanMessage(content=rag_prompt))
+
+        else:
+            messages.append(HumanMessage(content=message))
 
         response = self.llm.invoke(messages)
 

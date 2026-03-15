@@ -1,0 +1,52 @@
+<mxfile host="65bd71144e">
+    <diagram id="Oka3RLx2Ce-uSksMkj-2" name="Page-1">
+        <mxGraphModel dx="1004" dy="676" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="8" value="" style="edgeStyle=none;html=1;" parent="1" source="4" target="7" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="" style="image;sketch=0;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/mscae/Person.svg;" parent="1" vertex="1">
+                    <mxGeometry x="343" y="80" width="37" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="" style="edgeStyle=none;html=1;" parent="1" source="7" target="12" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;User Layer&lt;/font&gt;&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;chat_ui.py&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;Gradio Interface&lt;/font&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;verticalAlign=top;labelBackgroundColor=default;sketch=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="200" y="210" width="320" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="User" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="360" y="130" width="50" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="12" target="14">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="" style="edgeStyle=elbowEdgeStyle;html=1;elbow=vertical;" edge="1" parent="1" source="12" target="16">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="Agent Layer&lt;div&gt;core/agent.py&lt;/div&gt;&lt;div&gt;Task Orchestration&lt;/div&gt;" style="whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#f8cecc;strokeColor=#b85450;labelBackgroundColor=default;sketch=0;fontSize=14;" parent="1" vertex="1">
+                    <mxGeometry x="200" y="340" width="316.5" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="14" target="19">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="LLM Manager&lt;div&gt;llm_manager.py&lt;/div&gt;&lt;div&gt;Model Routing&lt;/div&gt;" style="whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#ffe6cc;strokeColor=#d79b00;labelBackgroundColor=default;sketch=0;fontSize=14;" vertex="1" parent="1">
+                    <mxGeometry x="170" y="480" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="16" target="21">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="RAG&lt;div&gt;./rag&lt;/div&gt;&lt;div&gt;Retrival Logic&lt;/div&gt;" style="whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#e1d5e7;strokeColor=#9673a6;labelBackgroundColor=default;sketch=0;fontSize=14;" vertex="1" parent="1">
+                    <mxGeometry x="450" y="480" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="LLM Models (DeepSeek)" style="whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#dae8fc;strokeColor=#6c8ebf;labelBackgroundColor=default;sketch=0;fontSize=14;" vertex="1" parent="1">
+                    <mxGeometry x="170" y="620" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="Vector Store&lt;div&gt;vector_store.py&lt;/div&gt;" style="whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#f8cecc;strokeColor=#b85450;labelBackgroundColor=default;sketch=0;fontSize=14;" vertex="1" parent="1">
+                    <mxGeometry x="450" y="620" width="120" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

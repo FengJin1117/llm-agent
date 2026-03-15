@@ -1,3 +1,5 @@
+# core/llm_manager.py
+
 from langchain_openai import ChatOpenAI
 from config import DEFAULT_MODEL
 import os

@@ -1,8 +1,9 @@
 gradio
 fastapi
 uvicorn
-langchain
+langchain>=1.0
 langchain-openai
 langchain-community
 faiss-cpu
 requests
+sentence-transformers
