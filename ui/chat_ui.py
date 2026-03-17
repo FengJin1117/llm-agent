@@ -5,6 +5,8 @@ import gradio as gr
 from core.agent import SimpleAgent
 from config import MODEL_LIST
 
+# 全局文档上下文（为了应对上传PDF的功能）
+document_context = None
 
 # 默认 agent
 agent = SimpleAgent(model_name=MODEL_LIST[0])
@@ -12,39 +14,50 @@ agent = SimpleAgent(model_name=MODEL_LIST[0])
 # 响应函数: 这里message需要用role、content、chat_history的格式封装成一个dict
 def respond(message, chat_history, model_name, use_rag=False):
 
+    global document_context
+
     agent = SimpleAgent(model_name)
 
     if chat_history is None:
         chat_history = []
 
-    # 添加用户消息（dict格式）
     chat_history.append({
         "role": "user",
         "content": message
     })
 
-    # 调用Agent
-    response = agent.chat(message, chat_history, use_rag)
+    # =========================
+    # ✅ 关键改动：传 document_context
+    # =========================
+    result = agent.chat(
+        message,
+        chat_history,
+        use_rag=use_rag,
+        document_context=document_context
+    )
 
-    # 添加assistant回复
-    chat_history.append({
-        "role": "assistant",
-        "content": response
-    })
 
-    if use_rag:
-        tool = "RAG Retrieval"
+    # =========================
+    # ✅ 根据返回类型处理
+    # =========================
+
+    if result["type"] == "image":
+
+        chat_history.append({
+            "role": "assistant",
+            "content": result["content"]
+        })
+
+        return "", chat_history, result["image_path"]
+
     else:
-        tool = "LLM Chat"
 
-    reasoning = f"""
-Step 1: Analyze user request  
-Step 2: Select tool → **{tool}**  
-Step 3: Call model `{model_name}`  
-Step 4: Generate response
-"""
+        chat_history.append({
+            "role": "assistant",
+            "content": result["content"]
+        })
 
-    return "", chat_history, reasoning
+        return "", chat_history, None
 
 def build_chat_ui():
 
@@ -69,62 +82,57 @@ def build_chat_ui():
         with gr.Row():
 
             # ----------------------
-            # Chat Area
+            # 左：Chat Area
             # ----------------------
 
             with gr.Column(scale=4):
 
-                with gr.Tabs():
+                gr.Markdown("### 💬 Chat")
 
-                    # ======================
-                    # Chat Tab
-                    # ======================
+                chatbot = gr.Chatbot(height=600, sanitize_html=False)
 
-                    with gr.Tab("💬 Chat"):
+                # with gr.Tabs():
 
-                        chatbot = gr.Chatbot(height=400, sanitize_html=False)
+                #     # ======================
+                #     # Chat Tab
+                #     # ======================
 
-                        # with gr.Accordion("Agent Reasoning", open=False):
+                #     with gr.Tab("💬 Chat"):
 
-                        #     reasoning = gr.Markdown(
-                        #         "Agent reasoning steps will appear here."
-                        #     )
+                #         chatbot = gr.Chatbot(height=400, sanitize_html=False)
 
-                    # ======================
-                    # Image Generation
-                    # ======================
 
-                    with gr.Tab("🎨 Image Generation"):
+            # ======================
+            # Image 展示（核心改动）
+            # ======================
+            with gr.Column(scale=2):
 
-                        gr.Markdown(
-                            "Generate images using Stable Diffusion"
-                        )
+                gr.Markdown("### 🖼 Generated Image")
 
-                        image_prompt = gr.Textbox(
-                            label="Prompt",
-                            placeholder="A futuristic city skyline at sunset"
-                        )
-
-                        generate_btn = gr.Button("Generate Image")
-
-                        image_output = gr.Image(
-                            label="Generated Image"
-                        )
-
-                        gr.Markdown(
-                            "_Image generation backend will be integrated later._"
-                        )
+                image_output = gr.Image(
+                    show_label=False,
+                    height=500
+                )
 
             # ----------------------
             # Agent Tools Panel
             # ----------------------
 
-            with gr.Column(scale=0.6):
+            with gr.Column(scale=1):
 
                 gr.Markdown("## ⚙️ Agent Tools")
 
+        
+                model_select = gr.Dropdown(
+                    choices=MODEL_LIST,
+                    value=MODEL_LIST[0],
+                    label="LLM Model"
+                )
+
+                gr.Markdown("---")
+
                 tool_llm = gr.Checkbox(label="💬 LLM Chat", value=True)
-                tool_img = gr.Checkbox(label="🎨 Image Generation")
+                # tool_img = gr.Checkbox(label="🎨 Image Generation")
                 # tool_video = gr.Checkbox(label="🎬 Video Generation")
                 tool_web = gr.Checkbox(label="🌐 Web Search")
 
@@ -144,16 +152,6 @@ def build_chat_ui():
                 upload_status = gr.Markdown(
                     "_No document uploaded._"
                 )
-
-
-                gr.Markdown("---")
-
-                model_select = gr.Dropdown(
-                    choices=MODEL_LIST,
-                    value=MODEL_LIST[0],
-                    label="LLM Model"
-                )
-
 
 
         # ======================
@@ -192,17 +190,38 @@ def build_chat_ui():
             inputs=msg, # Examples 输入必须要绑定到一个输入组件上，这样点击示例时会自动填充输入框
         )
 
-
         # ======================
         # Events
         # ======================
 
         def upload_document(file):
 
+            global document_context
+
             if file is None:
                 return "No file uploaded."
 
-            return f"✅ Document loaded: {file.name}"
+            # =========================
+            # ✅ 读取文件内容
+            # =========================
+            try:
+                if file.name.endswith(".pdf"):
+                    from PyPDF2 import PdfReader
+                    reader = PdfReader(file.name)
+                    text = ""
+                    for page in reader.pages:
+                        text += page.extract_text() or ""
+
+                else:
+                    with open(file.name, "r", encoding="utf-8") as f:
+                        text = f.read()
+
+                document_context = text
+
+                return f"✅ Document loaded: {file.name} (已进入上下文模式)"
+
+            except Exception as e:
+                return f"❌ 解析失败: {str(e)}"
 
         doc_upload.upload(
             upload_document,
@@ -214,7 +233,7 @@ def build_chat_ui():
             respond,
             # inputs=[msg, chatbot, model_select],
             inputs=[msg, chatbot, model_select, tool_rag], # 添加RAG选项
-            outputs=[msg, chatbot]
+            outputs=[msg, chatbot, image_output]
         )
 
     return demo

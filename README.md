@@ -17,22 +17,30 @@
 - ✅添加完整RAG pipeline
     - Vector DB: FAISS
     - embedding model: sentence-transformer
-- 
-- pdf阅读。
+- ✅图片改成图像框输出。推荐比例（80%）。
+    - 布局：chatbot | image | agent tools
+- ✅pdf在线阅读
+
+- 部署上Qwen-2.5-7B
 
 image generation栏可以去除。
 - 实现图像显形。
 - 添加天气、日期接口。
 ![系统界面_v0.2](images/demo_v0.2.png)
 
+
+能否在线部署？
+
 # TODO
 - **推理向**：可以测试某些经典benchmark，推理向。cot、web search、react框架，甚至说是multiagent
     - 加入最简单的模式。cot。"Let's think step by step." 
     - 预期拨款：6分
 
-- 封装一个sd api。如果绘图，LLM 重写prompt（提示词）。启动模型。部署在GPU上，随时待命。
+- ❌️：封装一个sd api。如果绘图，LLM 重写prompt（提示词）。启动模型。部署在GPU上，随时待命。（临时否决）
 
 qwen 2.5 omni
+
+未来的话，推理优化。
 
 对于简历贡献：
 多模态智能体原型系统（LLM Agent Platform）
@@ -59,7 +67,9 @@ Self-consistency: 49%
 ## v1.0
 - 版本条件：拿够6分
 
-累计分数：4
+累计分数：6
+
+项目投入上限：24小时（开发时间）。
 
 # QuickStart
 创建环境：

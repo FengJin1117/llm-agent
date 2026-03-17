@@ -47,44 +47,35 @@ class SimpleAgent:
 
         return None
 
-    def chat(self, message, history, use_rag=False):
+    def chat(self, message, history, use_rag=False, document_context=None):
 
         # 1 先判断是否调用工具
         tool = self.detect_tool(message)
 
+        # =========================
+        # ✅ 图片生成：返回结构化数据
+        # =========================
         if tool == "image_gen":
 
             img_path = generate_image_stub(message)
 
             if img_path:
-                # return f"我为你生成了一张图片：\n\n![]({img_path})"
-                # return f"我为你生成了一张图片： ![](/file=images/city_cyperpunk.png)"
-                return """
-我为你生成了一张图片：
-
-<img src="/file=images/city_cyperpunk.png" width="400">
-"""
+                return {
+                    "type": "image",
+                    "content": "我为你生成了一张图片",
+                    "image_path": img_path
+                }
             else:
-                return "图片生成失败"
+                return {
+                    "type": "text",
+                    "content": "图片生成失败"
+                }
 
 
         # 2 正常 LLM 对话
         messages = [
             SystemMessage(content="你是一个AI助手。")
         ]
-
-        # ===== RAG =====
-        # if use_rag:
-        #     docs = simple_retrieval(message)
-
-        #     if docs:
-        #         context = "\n".join(docs)
-
-        #         messages.append(
-        #             SystemMessage(
-        #                 content=f"参考知识库内容：\n{context}"
-        #             )
-        #         )
 
         # 加入历史
         for msg in history:    # history 是一个列表，包含之前的对话记录，每条记录是一个字典，包含 "role" 和 "content" 两个字段
@@ -95,8 +86,23 @@ class SimpleAgent:
             elif msg["role"] == "assistant":
                 messages.append(AIMessage(content=msg["content"]))
 
-                # RAG
-        if use_rag:
+        # =========================
+        # ✅ 优先：全文 context 模式
+        # =========================
+        if document_context:
+
+            full_prompt = f"""
+请基于以下完整文档回答问题：
+
+{document_context}
+
+问题：
+{message}
+"""
+
+            messages.append(HumanMessage(content=full_prompt))
+
+        elif use_rag:    # RAG
 
             context = retrieve(message)
 
@@ -116,4 +122,9 @@ class SimpleAgent:
 
         response = self.llm.invoke(messages)
 
-        return response.content
+        # return response.content
+
+        return {
+            "type": "text",
+            "content": response.content
+        }
